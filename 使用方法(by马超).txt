@@ -1,0 +1,12 @@
+使用方法：
+1、首先在cmd中拖入VSRename.exe 项目文件路径 要修改的内容 替换内容（重命名文件和目录）
+
+2、然后继续拖入入VSRename.exe 项目文件路径 要修改的内容 替换内容 true *.*   （修改包含解决方案的内容）
+
+3、批量删除.bak文件和bin以及obj文件夹
+先用cd方法定位到文件夹下
+del *.bak*  /s/q
+FOR /d /r . %d IN (bin) DO @IF EXIST "%d" rd /s /q "%d"
+FOR /d /r . %d IN (obj) DO @IF EXIST "%d" rd /s /q "%d"
+
+4、右击项目打开属性，查看程序集信息并修改
