@@ -58,14 +58,17 @@ namespace VSRename
             FileInfo[] files = dir.GetFiles("*.*");
             foreach (FileInfo file in files)
             {
-                string file_name = file.FullName;
-                if (file_name.Contains(find))
+                string file_name = file.Name;
+                string file_dir = file.DirectoryName;
+                if (file_name.Contains(find) && !file_name.Contains(replace_with))
                 {
+                    string file_full_name = file.FullName;
+                    string file_full_name_new = Path.Combine(file_dir, file_name.Replace(find, replace_with));
                     Console.WriteLine();
-                    Console.WriteLine("Renaming {0} -> {1}", file_name, file_name.Replace(find, replace_with));
+                    Console.WriteLine("Renaming {0} -> {1}", file_full_name, file_full_name_new);
                     try
                     {
-                        File.Move(file_name, file_name.Replace(find, replace_with));
+                        File.Move(file_full_name, file_full_name_new);
                     }
                     catch (Exception ex)
                     {
@@ -78,24 +81,27 @@ namespace VSRename
             DirectoryInfo[] child_dirs = dir.GetDirectories();
             foreach (DirectoryInfo child_dir in child_dirs)
             {
-                string child_dir_name = child_dir.FullName;
-                if (child_dir_name.Contains(find))
+                string child_dir_name = child_dir.Name;
+                string parent_dir_name = child_dir.Parent.FullName;
+                string child_dir_full_name = child_dir.FullName;
+
+                if (child_dir_name.Contains(find) && !child_dir_name.Contains(replace_with))
                 {
-                    string child_dir_name_new = child_dir_name.Replace(find, replace_with);
-                    Console.WriteLine(@"Renaming {0}\ -> {1}\", child_dir_name, child_dir_name_new);
+                    string child_dir_full_name_new = Path.Combine(parent_dir_name, child_dir_name.Replace(find, replace_with));
+                    Console.WriteLine(@"Renaming {0}\ -> {1}\", child_dir_full_name, child_dir_full_name_new);
                     try
                     {
                         Console.WriteLine();
-                        Directory.Move(child_dir_name, child_dir_name.Replace(find, replace_with));
+                        Directory.Move(child_dir_full_name, child_dir_full_name_new);
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine();
                         Console.WriteLine("ERROR: " + ex.Message);
                     }
-                    child_dir_name = child_dir_name_new;
+                    child_dir_full_name = child_dir_full_name_new;
                 }
-                RenameFiles(child_dir_name + @"\", find, replace_with);
+                RenameFiles(child_dir_full_name + @"\", find, replace_with);
             }
         }
 
@@ -117,10 +123,10 @@ namespace VSRename
                         Console.WriteLine();
                         Console.WriteLine(@"Renaming Contents of {0}", file_name);
 
-                        while (content.Contains(find))
-                        {
+                        //while (content.Contains(find))
+                        //{
                             content = content.Replace(find, replace_with);
-                        }
+                        //}
                         try
                         {
                             File.Move(file_name, file_name + ".bak_" + file.LastWriteTime.Ticks);
